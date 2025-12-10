@@ -1,0 +1,19 @@
+﻿# Build outputs
+bin/
+obj/
+
+# VS/IDE
+.vs/
+.vscode/
+
+# Node modules
+node_modules/
+
+# User secrets
+secrets.json
+
+# Logs
+*.log
+
+# Publish outputs
+publish/
