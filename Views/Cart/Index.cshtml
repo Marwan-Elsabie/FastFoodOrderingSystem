@@ -1,0 +1,146 @@
+﻿@model List<FastFoodOrderingSystem.Models.ShoppingCartItem>
+@{
+    ViewData["Title"] = "Shopping Cart";
+    decimal cartTotal = Model.Sum(item => item.Product.Price * item.Quantity);
+}
+
+<h2>Shopping Cart</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Your cart is empty. <a asp-controller="Home" asp-action="Menu">Browse our menu</a>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped" id="cart-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr data-productid="@item.ProductId">
+                        <td class="align-middle">
+                            <img src="@item.Product.ImageUrl" alt="@item.Product.Name" style="width:48px;height:48px;object-fit:cover;margin-right:.5rem;" />
+                            @item.Product.Name
+                        </td>
+                        <td class="align-middle">$@item.Product.Price.ToString("0.00")</td>
+                        <td class="align-middle">
+                            <input type="number" class="form-control quantity-input" value="@item.Quantity" min="1" style="width:80px;" />
+                        </td>
+                        <td class="align-middle item-total">$@((item.Product.Price * item.Quantity).ToString("0.00"))</td>
+                        <td class="align-middle">
+                            <button class="btn btn-sm btn-danger remove-btn">Remove</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                    <td id="cart-total"><strong>$@cartTotal.ToString("0.00")</strong></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-between">
+        <a asp-controller="Home" asp-action="Menu" class="btn btn-secondary">Continue Shopping</a>
+        <form asp-controller="Cart" asp-action="ClearCart" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-warning">Clear Cart</button>
+        </form>
+        <a asp-controller="Cart" asp-action="Checkout" class="btn btn-success">Proceed to Checkout</a>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        function getAntiForgeryToken() {
+            return $('input[name="__RequestVerificationToken"]').first().val();
+        }
+
+        $(function () {
+            // Quantity change handler
+            $('#cart-table').on('change', '.quantity-input', function () {
+                var $row = $(this).closest('tr');
+                var productId = $row.data('productid');
+                var quantity = parseInt($(this).val() || '0', 10);
+                if (quantity <= 0) {
+                    quantity = 1;
+                    $(this).val(quantity);
+                }
+
+                $.ajax({
+                    url: '@Url.Action("UpdateCart", "Cart")',
+                    method: 'POST',
+                    data: {
+                        productId: productId,
+                        quantity: quantity,
+                        __RequestVerificationToken: getAntiForgeryToken()
+                    },
+                    success: function (res) {
+                        if (res.success) {
+                            $row.find('.item-total').text('$' + res.itemTotal.toFixed(2));
+                            $('#cart-total').html('<strong>$' + res.cartTotal.toFixed(2) + '</strong>');
+                            toastr.success(res.message || 'Cart updated');
+                            // update cart badge by reloading the partial (simple approach)
+                            $.get('@Url.Action("CartBadgePartialReload", "Cart")', function (html) {
+                                $('header div').html(html);
+                            });
+                        } else {
+                            toastr.error(res.message || 'Failed to update cart');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Failed to update cart');
+                    }
+                });
+            });
+
+            // Remove button handler
+            $('#cart-table').on('click', '.remove-btn', function () {
+                var $row = $(this).closest('tr');
+                var productId = $row.data('productid');
+
+                $.ajax({
+                    url: '@Url.Action("RemoveFromCart", "Cart")',
+                    method: 'POST',
+                    data: {
+                        productId: productId,
+                        __RequestVerificationToken: getAntiForgeryToken()
+                    },
+                    success: function (res) {
+                        if (res.success) {
+                            $row.remove();
+                            $('#cart-total').html('<strong>$' + res.cartTotal.toFixed(2) + '</strong>');
+                            toastr.success(res.message || 'Item removed');
+                            $.get('@Url.Action("CartBadgePartialReload", "Cart")', function (html) {
+                                $('header div').html(html);
+                            });
+                            if ($('#cart-table tbody tr').length === 0) {
+                                location.reload(); // fallback to show empty cart message
+                            }
+                        } else {
+                            toastr.error(res.message || 'Failed to remove item');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Failed to remove item');
+                    }
+                });
+            });
+        });
+    </script>
+}

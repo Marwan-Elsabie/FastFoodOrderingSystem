@@ -1,0 +1,104 @@
+﻿@model Order
+@{
+    ViewData["Title"] = "Order Details - Admin";
+}
+
+<h2>Order Details</h2>
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5>Order #@Model.Id - @Model.CustomerName</h5>
+            <a asp-action="Orders" class="btn btn-secondary btn-sm">Back to All Orders</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <p><strong>Customer Information:</strong></p>
+                <p>Name: @Model.CustomerName</p>
+                <p>Phone: @Model.PhoneNumber</p>
+                <p>Email: @Model.UserId</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Order Information:</strong></p>
+                <p>Order Date: @Model.OrderDate.ToString("f")</p>
+                <p>
+                    Status:
+                    <form asp-action="UpdateOrderStatus" method="post" class="d-inline">
+                        <input type="hidden" name="orderId" value="@Model.Id" />
+                        <select name="status" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                            <option value="Pending" selected="@(Model.Status == "Pending")">Pending</option>
+                            <option value="Processing" selected="@(Model.Status == "Processing")">Processing</option>
+                            <option value="Completed" selected="@(Model.Status == "Completed")">Completed</option>
+                            <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Cancelled</option>
+                        </select>
+                    </form>
+                </p>
+                <p>Total Amount: $@Model.TotalAmount.ToString("0.00")</p>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <p><strong>Delivery Address:</strong></p>
+            <p>@Model.DeliveryAddress</p>
+        </div>
+
+        <hr>
+
+        <h5>Order Items</h5>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <tr>
+                            <td>@item.Product.Name</td>
+                            <td>@item.Quantity</td>
+                            <td>$@item.UnitPrice.ToString("0.00")</td>
+                            <td>$@((item.UnitPrice * item.Quantity).ToString("0.00"))</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                        <td><strong>$@Model.TotalAmount.ToString("0.00")</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Delivery Fee:</strong></td>
+                        <td><strong>$2.99</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Grand Total:</strong></td>
+                        <td><strong>$@((Model.TotalAmount + 2.99m).ToString("0.00"))</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            <form asp-action="UpdateOrderStatus" method="post">
+                <input type="hidden" name="orderId" value="@Model.Id" />
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Quick Status Update:</label>
+                        <div class="btn-group w-100" role="group">
+                            <button type="submit" name="status" value="Processing" class="btn btn-warning">Mark as Processing</button>
+                            <button type="submit" name="status" value="Completed" class="btn btn-success">Mark as Completed</button>
+                            <button type="submit" name="status" value="Cancelled" class="btn btn-danger">Cancel Order</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

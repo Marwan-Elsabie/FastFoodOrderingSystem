@@ -1,0 +1,132 @@
+﻿@model Product
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+<h2>Product Details</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="height: 300px; object-fit: cover;">
+            <div class="card-body">
+                <h5 class="card-title">@Model.Name</h5>
+                <p class="card-text">@Model.Description</p>
+                <p class="card-text"><strong>Price:</strong> $@Model.Price.ToString("0.00")</p>
+                <p class="card-text"><strong>Category:</strong> @Model.Category</p>
+                <p class="card-text">
+                    <strong>Status:</strong>
+                    @if (Model.IsAvailable)
+                    {
+                        <span class="badge bg-success">Available</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Unavailable</span>
+                    }
+                </p>
+
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h5>Customer Reviews</h5>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6>Add Your Review</h6>
+                                <form asp-controller="Review" asp-action="Create" method="post">
+                                    <input type="hidden" name="productId" value="@Model.Id" />
+                                    <div class="mb-3">
+                                        <label class="form-label">Rating</label>
+                                        <div class="rating">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <input type="radio" id="star@(i)" name="rating" value="@i" />
+                                                <label for="star@(i)" title="@i star">★</label>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Comment</label>
+                                        <textarea name="comment" class="form-control" rows="3" placeholder="Share your experience..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+
+                    @{
+                        var reviews = ViewBag.Reviews as List<Review> ?? new List<Review>();
+                    }
+
+                    @if (!reviews.Any())
+                    {
+                        <p class="text-muted">No reviews yet. Be the first to review!</p>
+                    }
+                    else
+                    {
+                        @foreach (var review in reviews)
+                        {
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <strong>@review.User.UserName</strong>
+                                            <div class="text-warning">
+                                                @for (int i = 0; i < review.Rating; i++)
+                                                {
+                                                    <span>★</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">@review.CreatedDate.ToString("MMM dd, yyyy")</small>
+                                    </div>
+                                    <p class="mt-2">@review.Comment</p>
+                                    @if (User.Identity.Name == review.User.UserName)
+                                    {
+                                        <form asp-controller="Review" asp-action="Delete" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@review.Id" />
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this review?')">Delete</button>
+                                        </form>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+
+        .rating input {
+            display: none;
+        }
+
+        .rating label {
+            cursor: pointer;
+            font-size: 2em;
+            color: #ddd;
+        }
+
+            .rating input:checked ~ label,
+            .rating label:hover,
+            .rating label:hover ~ label {
+                color: #ffc107;
+            }
+</style>

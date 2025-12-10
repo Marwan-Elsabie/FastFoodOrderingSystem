@@ -1,0 +1,96 @@
+﻿@model ContactViewModel
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<h2>Contact Us</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Get in Touch</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Contact" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Your Name</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email Address</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Subject" class="form-label">Subject</label>
+                        <input asp-for="Subject" class="form-control" />
+                        <span asp-validation-for="Subject" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Message" class="form-label">Message</label>
+                        <textarea asp-for="Message" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="Message" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Contact Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="contact-info">
+                    <div class="mb-4">
+                        <h6><i class="fas fa-map-marker-alt text-primary"></i> Address</h6>
+                        <p>123 Food Street<br>Fast Food City, FC 12345</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6><i class="fas fa-phone text-primary"></i> Phone</h6>
+                        <p>1-800-FAST-FOOD<br>(1-800-327-8366)</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6><i class="fas fa-envelope text-primary"></i> Email</h6>
+                        <p>support@fastfood.com<br>orders@fastfood.com</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6><i class="fas fa-clock text-primary"></i> Business Hours</h6>
+                        <p>
+                            Monday - Friday: 8:00 AM - 11:00 PM<br>
+                            Saturday - Sunday: 9:00 AM - 12:00 AM
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .contact-info h6 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .contact-info i {
+        margin-right: 10px;
+        font-size: 1.2em;
+    }
+</style>

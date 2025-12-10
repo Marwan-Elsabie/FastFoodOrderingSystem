@@ -1,0 +1,110 @@
+﻿/* Custom Styles for Fast Food Ordering System */
+
+/* Product Cards */
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .product-card img {
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+/* Cart Items */
+.cart-item {
+    border-bottom: 1px solid #dee2e6;
+    padding: 15px 0;
+}
+
+    .cart-item:last-child {
+        border-bottom: none;
+    }
+
+/* Badge Styles */
+.badge {
+    font-size: 0.75em;
+    padding: 0.35em 0.65em;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: #ff6b35;
+    border-color: #ff6b35;
+}
+
+    .btn-primary:hover {
+        background-color: #e55a2b;
+        border-color: #e55a2b;
+    }
+
+.btn-success {
+    background-color: #28a745;
+}
+
+/* Navbar Styles */
+.navbar-brand {
+    font-weight: bold;
+    color: #ff6b35 !important;
+}
+
+/* Order Status Badges */
+.badge-pending {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-processing {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.badge-completed {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge-cancelled {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Footer */
+.footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    margin-top: 50px;
+    position:relative;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 150px !important;
+    }
+
+    .navbar-nav {
+        text-align: center;
+    }
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0,0,0,.1);
+    border-radius: 50%;
+    border-top-color: #ff6b35;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

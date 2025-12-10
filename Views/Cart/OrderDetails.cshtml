@@ -1,0 +1,168 @@
+﻿@model Order
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<h2>Order Details</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Order #@Model.Id</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>Order Date:</strong> @Model.OrderDate.ToString("f")</p>
+                        <p>
+                            <strong>Status:</strong>
+                            <span class="badge bg-@(Model.Status == "Completed" ? "success" :
+                                                                                  Model.Status == "Processing" ? "warning" :
+                                                                                  Model.Status == "Cancelled" ? "danger" : "info")">
+                                @Model.Status
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Customer:</strong> @Model.CustomerName</p>
+                        <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+                    </div>
+                </div>
+
+                <p><strong>Delivery Address:</strong> @Model.DeliveryAddress</p>
+
+                <hr>
+
+                <h5>Order Items</h5>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderItems)
+                            {
+                                <tr>
+                                    <td>@item.Product.Name</td>
+                                    <td>@item.Quantity</td>
+                                    <td>$@item.UnitPrice.ToString("0.00")</td>
+                                    <td>$@((item.UnitPrice * item.Quantity).ToString("0.00"))</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td><strong>$@Model.TotalAmount.ToString("0.00")</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Delivery Fee:</strong></td>
+                                <td><strong>$2.99</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Grand Total:</strong></td>
+                                <td><strong>$@((Model.TotalAmount + 2.99m).ToString("0.00"))</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a asp-action="OrderHistory" class="btn btn-secondary">Back to Orders</a>
+                @if (Model.Status == "Pending")
+                {
+                    <form asp-action="CancelOrder" asp-route-id="@Model.Id" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel Order</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Order Timeline</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item @(Model.Status == "Pending" || Model.Status == "Processing" || Model.Status == "Completed" ? "active" : "")">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h6>Order Placed</h6>
+                            <small>@Model.OrderDate.ToString("g")</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item @(Model.Status == "Processing" || Model.Status == "Completed" ? "active" : "")">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h6>Order Processing</h6>
+                            <small>Preparing your order</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item @(Model.Status == "Completed" ? "active" : "")">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h6>Out for Delivery</h6>
+                            <small>On its way to you</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item @(Model.Status == "Completed" ? "active" : "")">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h6>Delivered</h6>
+                            <small>Order completed</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5>Need Help?</h5>
+            </div>
+            <div class="card-body">
+                <p>If you have any questions about your order, contact our customer support:</p>
+                <p><i class="fas fa-phone"></i> 1-800-FAST-FOOD</p>
+                <p><i class="fas fa-envelope"></i> support@fastfood.com</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -30px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #dee2e6;
+        border: 3px solid white;
+    }
+
+    .timeline-item.active .timeline-marker {
+        background-color: #28a745;
+    }
+
+    .timeline-content {
+        padding-left: 10px;
+    }
+</style>

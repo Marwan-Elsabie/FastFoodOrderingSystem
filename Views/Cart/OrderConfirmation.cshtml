@@ -1,0 +1,57 @@
+﻿@model Order
+@{
+    ViewData["Title"] = "Order Confirmation";
+}
+
+<h2>Order Confirmation</h2>
+<div class="alert alert-success">
+    <h4>Thank you for your order!</h4>
+    <p>Your order has been placed successfully. Order ID: <strong>#@Model.Id</strong></p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Order Details</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Order Date:</strong> @Model.OrderDate.ToString("f")</p>
+        <p><strong>Customer Name:</strong> @Model.CustomerName</p>
+        <p><strong>Delivery Address:</strong> @Model.DeliveryAddress</p>
+        <p><strong>Phone Number:</strong> @Model.PhoneNumber</p>
+        <p><strong>Status:</strong> <span class="badge bg-info">@Model.Status</span></p>
+
+        <h6 class="mt-4">Order Items:</h6>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrderItems)
+                {
+                    <tr>
+                        <td>@item.Product.Name</td>
+                        <td>@item.Quantity</td>
+                        <td>$@item.UnitPrice.ToString("0.00")</td>
+                        <td>$@((item.UnitPrice * item.Quantity).ToString("0.00"))</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
+                    <td><strong>$@Model.TotalAmount.ToString("0.00")</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Continue Shopping</a>
+    <a asp-controller="Cart" asp-action="OrderHistory" class="btn btn-secondary">View Order History</a>
+</div>

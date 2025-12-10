@@ -1,0 +1,14 @@
+@using FastFoodOrderingSystem.Models
+@using FastFoodOrderingSystem.Helpers
+@{
+    var cart = Context.Session.GetObject<List<ShoppingCartItem>>("Cart") ?? new List<ShoppingCartItem>();
+    var itemCount = cart.Sum(i => i.Quantity);
+}
+<a class="btn btn-outline-primary position-relative" href="@Url.Action("Index", "Cart")" title="View cart">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="ms-1">Cart</span>
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.7rem;">
+        @itemCount
+        <span class="visually-hidden">items in cart</span>
+    </span>
+</a>

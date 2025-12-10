@@ -1,0 +1,90 @@
+﻿@model List<Order>
+@{
+    ViewData["Title"] = "Order History";
+}
+
+<h2>Order History</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You haven't placed any orders yet. <a asp-controller="Home" asp-action="Menu">Start shopping</a>
+    </div>
+}
+else
+{
+    @foreach (var order in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Order #@order.Id</strong> - @order.OrderDate.ToString("f")
+                    </div>
+                    <div>
+                        <span class="badge bg-@(order.Status == "Completed" ? "success" :
+                                                                          order.Status == "Processing" ? "warning" :
+                                                                          order.Status == "Cancelled" ? "danger" : "info")">
+                    @order.Status
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in order.OrderItems)
+                                    {
+                                        <tr>
+                                            <td>@item.Product.Name</td>
+                                            <td>@item.Quantity</td>
+                                            <td>$@item.UnitPrice.ToString("0.00")</td>
+                                            <td>$@((item.UnitPrice * item.Quantity).ToString("0.00"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end"><strong>Order Total:</strong></td>
+                                        <td><strong>$@order.TotalAmount.ToString("0.00")</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Delivery Address:</strong><br>@order.DeliveryAddress</p>
+                        <p><strong>Phone:</strong> @order.PhoneNumber</p>
+                        <p><strong>Customer:</strong> @order.CustomerName</p>
+                        <div class="mt-3">
+                            <!-- CORRECT: View Details button is HERE, outside the items loop -->
+                            <a asp-action="OrderDetails" asp-route-id="@order.Id" class="btn btn-sm btn-info w-100 mb-2">
+                                <i class="fas fa-eye"></i> View Order Details
+                            </a>
+                            @if (order.Status == "Pending")
+                            {
+                                <form asp-action="CancelOrder" asp-route-id="@order.Id" method="post">
+                                    <button type="submit" class="btn btn-sm btn-danger w-100"
+                                            onclick="return confirm('Are you sure you want to cancel this order?')">
+                                        <i class="fas fa-times"></i> Cancel Order
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

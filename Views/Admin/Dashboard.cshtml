@@ -1,0 +1,83 @@
+﻿@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2>Admin Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Orders</h5>
+                <h2 class="card-text">@Model.TotalOrders</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Total Revenue</h5>
+                <h2 class="card-text">$@Model.TotalRevenue.ToString("0.00")</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Pending Orders</h5>
+                <h2 class="card-text">@Model.PendingOrders</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Total Products</h5>
+                <h2 class="card-text">@Model.TotalProducts</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>Recent Orders</h4>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model.RecentOrders)
+            {
+                <tr>
+                    <td>#@order.Id</td>
+                    <td>@order.CustomerName</td>
+                    <td>@order.OrderDate.ToString("g")</td>
+                    <td>$@order.TotalAmount.ToString("0.00")</td>
+                    <td>
+                        <span class="badge bg-@(order.Status == "Completed" ? "success" :
+                                                                          order.Status == "Processing" ? "warning" :
+                                                                          order.Status == "Cancelled" ? "danger" : "info")">
+                        @order.Status
+                    </span>
+                </td>
+                <td>
+                    <a asp-controller="Admin" asp-action="OrderDetails" asp-route-id="@order.Id" class="btn btn-sm btn-info">View</a>
+                </td>
+            </tr>
+                        }
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-4">
+    <a asp-controller="Products" asp-action="Index" class="btn btn-primary">Manage Products</a>
+    <a asp-controller="Admin" asp-action="Orders" class="btn btn-secondary">View All Orders</a>
+</div>
