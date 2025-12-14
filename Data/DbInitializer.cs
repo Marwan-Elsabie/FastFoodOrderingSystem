@@ -5,7 +5,7 @@ namespace FastFoodOrderingSystem.Data
 {
     public static class DbInitializer
     {
-        public static async Task Initialize(ApplicationDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task Initialize(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             context.Database.EnsureCreated();
 
@@ -25,11 +25,13 @@ namespace FastFoodOrderingSystem.Data
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null)
             {
-                adminUser = new IdentityUser
+                adminUser = new ApplicationUser
                 {
                     UserName = adminEmail,
                     Email = adminEmail,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    FullName = "Admin",
+                    DeliveryAddress = ""
                 };
                 await userManager.CreateAsync(adminUser, "Admin@123");
                 await userManager.AddToRoleAsync(adminUser, "Admin");

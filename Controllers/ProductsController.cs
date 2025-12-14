@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using FastFoodOrderingSystem.Data;
 using FastFoodOrderingSystem.Models;
 using Microsoft.AspNetCore.Authorization;
+using FastFoodOrderingSystem.Services; // Add this using directive
 
 namespace FastFoodOrderingSystem.Controllers
 {
@@ -10,10 +11,12 @@ namespace FastFoodOrderingSystem.Controllers
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IRecommendationService _recommendationService; // Add this line
 
-        public ProductsController(ApplicationDbContext context)
+        public ProductsController(ApplicationDbContext context, IRecommendationService recommendationService) // Modify this line
         {
             _context = context;
+            _recommendationService = recommendationService; // Add this line
         }
 
         // GET: Products
@@ -36,6 +39,9 @@ namespace FastFoodOrderingSystem.Controllers
             {
                 return NotFound();
             }
+
+            var alsoBought = await _recommendationService.GetAlsoBoughtAsync(product.Id, 4); // Add this line
+            ViewBag.AlsoBought = alsoBought; // Add this line
 
             return View(product);
         }

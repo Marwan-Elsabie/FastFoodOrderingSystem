@@ -28,6 +28,11 @@
                         <input asp-for="PhoneNumber" class="form-control" />
                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                     </div>
+                    <div class="mb-3">
+                        <label asp-for="DeliveryAddress" class="form-label">Delivery Address</label>
+                        <textarea asp-for="DeliveryAddress" class="form-control"></textarea>
+                        <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
+                    </div>
                     <button type="submit" class="btn btn-primary">Update Profile</button>
                 </form>
             </div>

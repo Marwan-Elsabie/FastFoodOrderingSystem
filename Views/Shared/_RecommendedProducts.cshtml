@@ -1,0 +1,35 @@
+﻿@model List<FastFoodOrderingSystem.Models.Product>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="recommended-empty"></div>
+}
+else
+{
+    <div class="recommended-products mt-4">
+        <h5 class="mb-3">Recommended for you</h5>
+        <div class="row">
+            @foreach (var p in Model)
+            {
+                <div class="col-6 col-md-3 mb-3">
+                    <div class="card h-100">
+                        <img src="@(!string.IsNullOrEmpty(p.ImageUrl) ? p.ImageUrl : Url.Content("~/images/placeholder.png"))" class="card-img-top" style="height:140px;object-fit:cover;" alt="@p.Name" />
+                        <div class="card-body p-2">
+                            <h6 class="card-title mb-1" style="font-size:0.95rem;">
+                                <a asp-controller="Home" asp-action="Product" asp-route-id="@p.Id">@p.Name</a>
+                            </h6>
+                            <div class="text-muted small">@($"{p.Price:C}")</div>
+                        </div>
+                        <div class="card-footer p-2">
+                            <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                <input type="hidden" name="productId" value="@p.Id" />
+                                <input type="hidden" name="quantity" value="1" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

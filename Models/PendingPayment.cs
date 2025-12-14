@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FastFoodOrderingSystem.Models
 {
@@ -19,8 +20,12 @@ namespace FastFoodOrderingSystem.Models
 
         public string PhoneNumber { get; set; }
 
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // When the pending payment was processed (set by webhook). Nullable for idempotency checks.
+        public DateTime? ProcessedAt { get; set; }
     }
 }

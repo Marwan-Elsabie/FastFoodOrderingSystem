@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -18,10 +18,10 @@ namespace FastFoodOrderingSystem.Models
         public DateTime AddedDate { get; set; } = DateTime.Now;
 
         // Navigation properties
-        [ForeignKey("ProductId")]
-        public virtual Product Product { get; set; }
+        [ForeignKey(nameof(ProductId))]
+        public Product Product { get; set; }
 
-        [ForeignKey("UserId")]
-        public virtual IdentityUser User { get; set; }
+        [ForeignKey(nameof(UserId))]
+        public ApplicationUser User { get; set; }
     }
 }

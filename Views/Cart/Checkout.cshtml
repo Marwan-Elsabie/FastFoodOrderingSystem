@@ -27,8 +27,9 @@
 
                         <div class="mb-3">
                             <label asp-for="DeliveryAddress" class="form-label"></label>
-                            <textarea asp-for="DeliveryAddress" class="form-control" rows="3"></textarea>
+                            <textarea asp-for="DeliveryAddress" id="delivery-address" class="form-control" rows="3" autocomplete="off"></textarea>
                             <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
+                            <small class="form-text text-muted">Enter full delivery address.</small>
                         </div>
 
                         <div class="mb-3">
@@ -110,12 +111,31 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 
     <script>
-        // Prevent double submit and show a spinner
-        $('#place-order-btn').on('click', function () {
-            var $btn = $(this);
-            $btn.prop('disabled', true).text('Processing...');
-            $btn.closest('form').submit();
-        });
+        (function () {
+            var $btn = $('#place-order-btn');
+            var $form = $btn.closest('form');
+
+            // handle actual form submission to avoid disabling button before submit is initiated
+            $form.on('submit', function (e) {
+                // client validation
+                if (!$form.valid()) {
+                    return; // let validation show errors
+                }
+
+                // prevent duplicate submits
+                if ($form.data('submitted')) {
+                    e.preventDefault();
+                    return;
+                }
+
+                $form.data('submitted', true);
+
+                // disable button after a tiny delay so the browser can start the submit
+                setTimeout(function () {
+                    $btn.prop('disabled', true).text('Processing...');
+                }, 10);
+            });
+        })();
     </script>
 }
 

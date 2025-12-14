@@ -16,14 +16,15 @@ namespace FastFoodOrderingSystem.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IEmailService _emailService;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<CartController> _logger;
 
-        public CartController(ApplicationDbContext context,
-            IHttpContextAccessor httpContextAccessor,
-            UserManager<IdentityUser> userManager,
-            IEmailService emailService,
-            ILogger<CartController> logger)
+        public CartController(
+    ApplicationDbContext context,
+    IHttpContextAccessor httpContextAccessor,
+    UserManager<ApplicationUser> userManager,
+    IEmailService emailService,
+    ILogger<CartController> logger)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -88,6 +89,7 @@ namespace FastFoodOrderingSystem.Controllers
         [HttpPost]
         public IActionResult UpdateCart(int productId, int quantity)
         {
+
             var cart = GetCartItems();
             var item = cart.FirstOrDefault(i => i.ProductId == productId);
             if (item == null)
@@ -97,21 +99,19 @@ namespace FastFoodOrderingSystem.Controllers
 
             if (quantity <= 0)
             {
-                // remove item
                 cart.Remove(item);
+                SaveCartItems(cart);
+                var cartTotalAfterRemoval = Math.Round(cart.Sum(i => i.Product.Price * i.Quantity), 2);
+                return Json(new { success = true, itemTotal = 0m, cartTotal = cartTotalAfterRemoval, message = "Item removed" });
             }
             else
             {
                 item.Quantity = quantity;
+                SaveCartItems(cart);
+                var itemTotal = Math.Round(item.Product.Price * item.Quantity, 2);
+                var cartTotal = Math.Round(cart.Sum(i => i.Product.Price * i.Quantity), 2);
+                return Json(new { success = true, itemTotal = itemTotal, cartTotal = cartTotal, message = "Cart updated" });
             }
-
-            SaveCartItems(cart);
-
-            // recalc totals
-            var itemTotal = Math.Round(item.Product.Price * item.Quantity, 2);
-            var cartTotal = Math.Round(cart.Sum(i => i.Product.Price * i.Quantity), 2);
-
-            return Json(new { success = true, itemTotal = itemTotal, cartTotal = cartTotal, message = "Cart updated" });
         }
 
         [HttpPost]
@@ -138,7 +138,7 @@ namespace FastFoodOrderingSystem.Controllers
         }
 
         [Authorize]
-        public IActionResult Checkout()
+        public async Task<IActionResult> Checkout()
         {
             var cart = GetCartItems();
             if (!cart.Any())
@@ -148,10 +148,53 @@ namespace FastFoodOrderingSystem.Controllers
 
             ViewBag.Cart = cart;
             ViewBag.Total = cart.Sum(item => item.Product.Price * item.Quantity);
+
+            // Prefill from profile where available
             var vm = new PlaceOrderViewModel
             {
-                CustomerName = User.Identity?.Name ?? string.Empty
+                CustomerName = User.Identity?.Name ?? string.Empty,
+                DeliveryAddress = string.Empty,
+                PhoneNumber = string.Empty
             };
+
+            if (User?.Identity?.IsAuthenticated ?? false)
+            {
+                try
+                {
+                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        var user = await _userManager.FindByIdAsync(userId);
+                        if (user != null)
+                        {
+                            // IdentityUser includes PhoneNumber by default
+                            if (!string.IsNullOrEmpty(user.PhoneNumber))
+                                vm.PhoneNumber = user.PhoneNumber;
+
+                            // Prefer official user name when CustomerName is empty
+                            if (string.IsNullOrEmpty(vm.CustomerName) && !string.IsNullOrEmpty(user.UserName))
+                                vm.CustomerName = user.UserName;
+
+                            // Try to read an address stored as a user claim (common patterns)
+                            var claims = await _userManager.GetClaimsAsync(user);
+                            var addressClaim = claims.FirstOrDefault(c =>
+                                string.Equals(c.Type, "address", StringComparison.OrdinalIgnoreCase) ||
+                                string.Equals(c.Type, "street_address", StringComparison.OrdinalIgnoreCase) ||
+                                string.Equals(c.Type, "delivery_address", StringComparison.OrdinalIgnoreCase) ||
+                                string.Equals(c.Type, "DeliveryAddress", StringComparison.OrdinalIgnoreCase));
+                            if (addressClaim != null && !string.IsNullOrEmpty(addressClaim.Value))
+                            {
+                                vm.DeliveryAddress = addressClaim.Value;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to prefill checkout from user profile; continuing without prefill.");
+                }
+            }
+
             return View(vm);
         }
 

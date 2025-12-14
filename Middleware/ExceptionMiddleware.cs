@@ -1,4 +1,6 @@
-﻿namespace FastFoodOrderingSystem.Middleware
+﻿using System.Text.Json;
+
+namespace FastFoodOrderingSystem.Middleware
 {
     public class ExceptionMiddleware
     {
@@ -31,13 +33,15 @@
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
+            // Return full exception details in development so you can see inner TypeLoadException and stack trace.
             var response = new
             {
-                StatusCode = context.Response.StatusCode,
-                Message = "An error occurred while processing your request.",
-                Detailed = _env.IsDevelopment() ? exception.Message : null
+                statusCode = context.Response.StatusCode,
+                message = "An error occurred while processing your request.",
+                detailed = _env.IsDevelopment() ? exception.ToString() : null
             };
 
+            // Use System.Text.Json with default options
             await context.Response.WriteAsJsonAsync(response);
         }
     }

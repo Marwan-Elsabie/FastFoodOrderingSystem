@@ -54,7 +54,13 @@
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                                     <li><a class="dropdown-item" asp-controller="Cart" asp-action="OrderHistory">Order History</a></li>
                                     <!-- Fixed: point to Identity Manage Razor Page -->
-                                    <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Profile</a></li>
+                                    <li>
+                                        <a asp-controller="Profile"
+                                           asp-action="Index"
+                                           class="nav-link">
+                                            Profile
+                                        </a>
+                                    </li>
                                     @if (User.IsInRole("Admin"))
                                     {
                                         <li><hr class="dropdown-divider" /></li>
@@ -62,9 +68,13 @@
                                     }
                                     <li><hr class="dropdown-divider" /></li>
                                     <li>
-                                        <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="px-3 py-2" id="logoutForm">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-link nav-link p-0">Logout</button>
+                                        <form asp-area="Identity"
+                                              asp-page="/Account/Logout"
+                                              method="post"
+                                              class="d-inline">
+                                            <button type="submit" class="btn btn-link nav-link">
+                                                Logout
+                                            </button>
                                         </form>
                                     </li>
                                 </ul>

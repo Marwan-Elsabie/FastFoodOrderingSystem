@@ -36,6 +36,18 @@
     </div>
 </div>
 
+@* Top selling recommendations shown under the filter (calls the shared partial) *@
+@{
+    var topSelling = ViewBag.TopSelling as List<Product> ?? new List<Product>();
+}
+@if (topSelling.Any())
+{
+    <div class="mb-4">
+        <h5>Top selling</h5>
+        @await Html.PartialAsync("~/Views/Shared/_RecommendedProducts.cshtml", topSelling)
+    </div>
+}
+
 @if (!Model.Any())
 {
     <div class="alert alert-info">

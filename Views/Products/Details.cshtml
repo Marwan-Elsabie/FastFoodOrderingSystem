@@ -99,6 +99,16 @@
                 </div>
             </div>
 
+            @* Render recommendations returned by the controller (ViewBag.AlsoBought) *@
+            @{
+                var alsoBought = ViewBag.AlsoBought as List<Product> ?? new List<Product>();
+            }
+            @if (alsoBought.Any())
+            {
+                <hr />
+                @await Html.PartialAsync("~/Views/Shared/_RecommendedProducts.cshtml", alsoBought)
+            }
+
             <div class="card-footer">
                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
                 <a asp-action="Index" class="btn btn-secondary">Back to List</a>

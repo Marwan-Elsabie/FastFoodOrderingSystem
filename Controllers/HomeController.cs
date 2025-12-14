@@ -1,6 +1,7 @@
 using FastFoodOrderingSystem.Data;
 using FastFoodOrderingSystem.Helpers;
 using FastFoodOrderingSystem.Models;
+using FastFoodOrderingSystem.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -13,13 +14,14 @@ namespace FastFoodOrderingSystem.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly IMemoryCache _cache;
+        private readonly IRecommendationService _recommendationService;
 
-
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, IMemoryCache cache)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, IMemoryCache cache, IRecommendationService recommendationService)
         {
             _logger = logger;
             _context = context;
             _cache = cache;
+            _recommendationService = recommendationService;
         }
 
         public async Task<IActionResult> Index()
@@ -68,6 +70,10 @@ namespace FastFoodOrderingSystem.Controllers
 
             ViewBag.SearchTerm = searchTerm;
             ViewBag.Category = category;
+
+            // New: Top selling products for the menu page
+            var topSelling = await _recommendationService.GetTopSellingAsync(4);
+            ViewBag.TopSelling = topSelling;
 
             var paginatedProducts = await PaginatedList<Product>.CreateAsync(products, pageIndex, pageSize);
             return View(paginatedProducts);

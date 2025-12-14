@@ -10,5 +10,8 @@ namespace FastFoodOrderingSystem.Models
         [Phone]
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
+
+        [Display(Name = "Delivery Address")]
+        public string DeliveryAddress { get; set; }
     }
 }
