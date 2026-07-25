@@ -16,9 +16,9 @@ A complete ASP.NET Core MVC fast food ordering system with admin panel.
 
 ## Setup Instructions
 1. Clone repository
-2. Update connection string in appsettings.json
-3. Run migrations: `dotnet ef database update`
-4. Run application: `dotnet run`
+2. Set the connection string via user secrets (keeps it out of source control):
+   `dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=(localdb)\MSSQLLocalDB;Database=FastFoodOrderingSystemDb;Trusted_Connection=True;MultipleActiveResultSets=true"`
+3. Run application: `dotnet run` — the database is created and seeded automatically on startup (see `Data/DbInitializer.cs`)
 
 ## Admin Credentials
 - Email: admin@fastfood.com

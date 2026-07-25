@@ -5,6 +5,7 @@ obj/
 # VS/IDE
 .vs/
 .vscode/
+.claude/
 
 # Node modules
 node_modules/
